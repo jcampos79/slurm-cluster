@@ -1,6 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-slurm_computer = {
+slurm_compute = {
     :worker1 => {                                                              
         :hostname => "worker1",
         :ipaddress => "192.168.56.181"
@@ -54,7 +54,7 @@ Vagrant.configure("2") do |config|
         head.vm.provision "shell", inline: $head_script
     end
 
-    slurm_cluster.each_pair do |name, options|
+    slurm_compute.each_pair do |name, options|
         global_config.vm.define name do |config|
             config.vm.box = "centos/7"
             config.vm.hostname = "#{name}"
