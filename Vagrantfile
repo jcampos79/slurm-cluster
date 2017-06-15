@@ -54,7 +54,7 @@ systemctl enable nfs-server.service
 systemctl restart nfs-server.service
 echo "AUTO FS"
 echo "/-    /etc/auto.direct" >> /etc/auto.master
-echo "#/mnt/shared  nfsvers=3,rw,intr head:/mnt/shared" > /etc/auto.direct
+echo "#/mnt/shared     -fstype=nfs,vers=3,noatime      head:/mnt/shared" > /etc/auto.direct
 systemctl enable autofs
 systemctl restart autofs
 SCRIPT
@@ -74,7 +74,7 @@ $node_script = <<SCRIPT
 echo " Worker configuration specific"
 echo "AUTO FS"
 echo "/-    /etc/auto.direct" >> /etc/auto.master
-echo "/mnt/shared  nfsvers=3,rw,intr head:/mnt/shared" > /etc/auto.direct
+echo "/mnt/shared     -fstype=nfs,vers=3,noatime      head:/mnt/shared" > /etc/auto.direct
 systemctl enable autofs
 systemctl restart autofs
 cd /mnt/shared/slurm/x86_64/
