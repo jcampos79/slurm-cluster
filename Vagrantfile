@@ -4,7 +4,7 @@ slurm_compute = {
     :worker1 => {                                                              
         :hostname => "worker1",
         :ipaddress => "192.168.56.181"
-    }
+    },
     :worker2 => {                                                              
         :hostname => "worker2",
         :ipaddress => "192.168.56.182"
@@ -21,8 +21,8 @@ systemctl enable ntpd
 ntpdate pool.ntp.org
 systemctl start ntpd
 echo "Installing munge"
-yum install munge munge-libs munge-devel
-echo "Seeting hosts file"
+yum -y install munge munge-libs munge-devel
+echo "Setting hosts file"
 echo "192.168.56.180    head" >> /etc/hosts
 echo "192.168.56.181    worker1" >> /etc/hosts
 echo "192.168.56.182    worker2" >> /etc/hosts
@@ -55,13 +55,14 @@ Vagrant.configure("2") do |config|
     end
 
     slurm_compute.each_pair do |name, options|
-        global_config.vm.define name do |config|
-            config.vm.box = "centos/7"
-            config.vm.hostname = "#{name}"
-            config.vm.network "private_network", ip: options[:ipaddress]
-            config.vm.provider :virtualbox do |v|
+        config.vm.define name do |worker|
+            worker.vm.box = "centos/7"
+            worker.vm.hostname = "#{name}"
+            worker.vm.network "private_network", ip: options[:ipaddress]
+            worker.vm.provider :virtualbox do |v|
                 v.customize ["modifyvm", :id, "--cpus", "2"]
             end
-            config.vm.provision :shell, :inline => $initiator_script
+            worker.vm.provision :shell, :inline => $initiator_script
+        end
     end
 end
