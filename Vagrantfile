@@ -59,7 +59,7 @@ systemctl enable autofs
 systemctl restart autofs
 SCRIPT
 
-$slurm_script = <<SCRIPT
+$buildslurm_script = <<SCRIPT
 echo "Build SLURM"
 mkdir -p /mnt/shared/slurm
 cd /mnt/shared/slurm/
@@ -81,6 +81,54 @@ cd /mnt/shared/slurm/x86_64/
 yum -y localinstall --nogpgcheck slurm-16.05.10-2*rpm slurm-devel-16.05.10-2*rpm slurm-munge-16.05.10-2*rpm slurm-perlapi-16.05.10-2*rpm slurm-plugins-16.05.10-2*rpm slurm-sjobexit-16.05.10-2*rpm slurm-sjstat-16.05.10-2*rpm slurm-torque-16.05.10-2*rpm slurm-seff-16.05.10-2*rpm
 SCRIPT
 
+$configure_slurm_head = <<SCRIPT
+echo "Remove init scripts slurm"
+chkconfig --del slurm
+rm -f /etc/init.d/slurm
+echo "Enabling slurm services"
+systemctl enable slurmctld.service
+systemctl enable slurmdbd.service
+echo "Head configuration"
+mkdir /var/spool/slurmctld /var/log/slurm
+chown slurm: /var/spool/slurmctld /var/log/slurm
+chmod 755 /var/spool/slurmctld /var/log/slurm
+touch /var/log/slurm/slurmctld.log
+chown slurm: /var/log/slurm/slurmctld.log
+touch /var/log/slurm/slurm_jobacct.log /var/log/slurm/slurm_jobcomp.log
+chown slurm: /var/log/slurm/slurm_jobacct.log /var/log/slurm/slurm_jobcomp.log
+wget -O /etc/slurm/slurm.conf https://raw.githubusercontent.com/jcampos79/slurm-cluster/master/confs/slurm.conf
+wget -O /etc/slurm/slurmdbd.conf https://raw.githubusercontent.com/jcampos79/slurm-cluster/master/confs/slurmdbd.conf
+echo " Configuration slurmdbd"
+chown slurm: /etc/slurm/slurmdbd.conf
+chmod 600 /etc/slurm/slurmdbd.conf
+touch /var/log/slurm/slurmdbd.log
+chown slurm: /var/log/slurm/slurmdbd.log
+SCRIPT
+
+$configure_slurm_compute = <<SCRIPT
+echo "Remove init scripts slurm"
+chkconfig --del slurm
+rm -f /etc/init.d/slurm
+echo "Enabling slurm services"
+systemctl enable slurmd.service
+echo "Compute Node configuration"
+mkdir /var/spool/slurmd /var/log/slurm
+chown slurm: /var/spool/slurmd /var/log/slurm
+chmod 755 /var/spool/slurmd /var/log/slurm
+touch /var/log/slurm/slurmd.log
+chown slurm: /var/log/slurm/slurmd.log
+wget -O /etc/slurm/slurm.conf https://raw.githubusercontent.com/jcampos79/slurm-cluster/master/confs/slurm.conf
+SCRIPT
+
+$configure_mysql_head = <<SCRIPT
+echo " Enable and start MariaDB service"
+systemctl enable mariadb.service
+systemctl start mariadb.service
+
+
+SCRIPT
+
+
 Vagrant.configure("2") do |config|
     config.vm.define "head" do |head|
         head.vm.box = "centos/7"
@@ -89,7 +137,8 @@ Vagrant.configure("2") do |config|
         head.vm.provision "shell", inline: $initiator_script
         head.vm.provision "shell", inline: $head_script
         head.vm.provision "shell", inline: $nfs_script
-        head.vm.provision "shell", inline: $slurm_script
+        head.vm.provision "shell", inline: $buildslurm_script
+        head.vm.provision "shell", inline: $configure_slurm_head
     end
 
     slurm_compute.each_pair do |name, options|
@@ -102,6 +151,7 @@ Vagrant.configure("2") do |config|
             end
             worker.vm.provision :shell, :inline => $initiator_script
             worker.vm.provision :shell, :inline => $node_script
+            worker.vm.provision :shell, :inline => $configure_slurm_compute
         end
     end
 end
