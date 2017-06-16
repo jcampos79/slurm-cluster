@@ -176,7 +176,7 @@ SCRIPT
 
 $starting_services_compute = <<SCRIPT
 systemctl start munge
-systemctl 
+systemctl start slurmd
 SCRIPT
 
 
