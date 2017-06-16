@@ -124,6 +124,8 @@ $configure_mysql_head = <<SCRIPT
 echo " Enable and start MariaDB service"
 systemctl enable mariadb.service
 systemctl start mariadb.service
+wget -O /tmp/mysql_secure.sh https://raw.githubusercontent.com/jcampos79/slurm-cluster/master/scripts/mysql_secure.sh
+bash /tmp/mysql_secure.sh
 
 
 SCRIPT
