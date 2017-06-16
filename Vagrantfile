@@ -64,7 +64,7 @@ echo "Build SLURM"
 mkdir -p /mnt/shared/slurm
 cd /mnt/shared/slurm/
 wget https://www.schedmd.com/downloads/archive/slurm-16.05.10-2.tar.bz2 -a /tmp/wget_slurm.log
-rpmbuild -ta slurm-16.05.10-2.tar.bz2 --define "_rpmdir /mnt/shared/slurm" 2>&1 /tmp/rpmbuild_slurm.log
+rpmbuild -ta slurm-16.05.10-2.tar.bz2 --define "_rpmdir /mnt/shared/slurm" --quiet 2>&1 /tmp/rpmbuild_slurm.log
 cd x86_64/
 yum -y localinstall --nogpgcheck slurm-16.05.10-2*rpm slurm-devel-16.05.10-2*rpm slurm-munge-16.05.10-2*rpm slurm-perlapi-16.05.10-2*rpm slurm-plugins-16.05.10-2*rpm slurm-sjobexit-16.05.10-2*rpm slurm-sjstat-16.05.10-2*rpm slurm-torque-16.05.10-2*rpm slurm-seff-16.05.10-2*rpm slurm-slurmdbd-16.05.10-2*rpm slurm-sql-16.05.10-2*rpm slurm-plugins-16.05.10-2*rpm
 SCRIPT
