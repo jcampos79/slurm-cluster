@@ -126,8 +126,8 @@ systemctl enable mariadb.service
 systemctl start mariadb.service
 wget -O /tmp/mysql_secure.sh https://raw.githubusercontent.com/jcampos79/slurm-cluster/master/scripts/mysql_secure.sh
 bash /tmp/mysql_secure.sh
-
-
+wget -O /tmp/mysql_slurmdbd.sh https://raw.githubusercontent.com/jcampos79/slurm-cluster/master/scripts/msyql_slurmdbd.sh
+bash /tmp/mysql_slurmdbd.sh qaz123wsx
 SCRIPT
 
 
@@ -140,6 +140,7 @@ Vagrant.configure("2") do |config|
         head.vm.provision "shell", inline: $head_script
         head.vm.provision "shell", inline: $nfs_script
         head.vm.provision "shell", inline: $buildslurm_script
+        head.vm.provision "shell", inline: $configure_mysql_head
         head.vm.provision "shell", inline: $configure_slurm_head
     end
 
