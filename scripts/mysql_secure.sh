@@ -29,6 +29,3 @@ SECURE_MYSQL=$(expect -c "
 echo "${SECURE_MYSQL}"
 
 yum -y remove expect
-~
-~
-
