@@ -166,12 +166,23 @@ sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_c
 systemctl restart sshd.service
 SCRIPT
 
+$accounting_head = <<SCRIPT
+echo "Starting munge service"
+systemctl restart munge
+echo "Starting slurmdbd service"
+systemctl restart slurmdbd.service
+echo "Creating Cluster on Accounting"
+sacctmgr -i add cluster hpc
+echo "Creating Account"
+sacctmgr -i add account it Description="IT Department" Organization=it
+echo "Creating User"
+sacctmgr -i create user name=vagrant DefaultAccount=it
+
+SCRIPT
 
 $starting_services_head = <<SCRIPT
-
-systemctl start munge
-systemctl start slurmdbd.service
-
+echo "starting slurmctld service"
+systemctl restart slurmctld
 SCRIPT
 
 $starting_services_compute = <<SCRIPT
@@ -193,6 +204,7 @@ Vagrant.configure("2") do |config|
         head.vm.provision "shell", inline: $configure_mysql_head
         head.vm.provision "shell", inline: $configure_slurm_head
         head.vm.provision "shell", inline: $sshd_head
+        head.vm.provision "shell", inline: $accounting_head
         head.vm.provision "shell", inline: $starting_services_head
     end
 
